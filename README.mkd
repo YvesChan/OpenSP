@@ -1,0 +1,19 @@
+OpenSP
+=========
+
+Current version: 0.1.1
+
+OpenSP is a mutil-thread web spider written in python. It's partly based on another open source program, but I have redesigned it.
+
+At the beginning, I followed Knownsec's [requirement](http://blog.knownsec.com/2012/02/knownsec-recruitment/) to wrote this spider. It mainly uses the library below:
+* Requests
+* BeautifulSoup
+* threading
+* Queue
+* argparse
+* sqlite3
+* urlparse
+* robotparser
+
+The first two libs are third-party library. You should have installed them before running this program. If not, use 'pip install' to manage your python packages.
+
