@@ -100,7 +100,7 @@ class Worker(Thread):
         super(Worker, self).__init__()
         self.spider = spider
         self.status = True
-        self.isDaemon = True
+        self.daemon = True
         self.start()
 
     def run(self):
@@ -108,14 +108,14 @@ class Worker(Thread):
             try:
                 url = self.spider.task_list.get(timeout = 1)
             except Empty:
-                log.info('%s: task_list Empty' % self.name)
+                # log.info('%s: task_list Empty' % self.name)
                 continue
             self.spider.increase_running()
             if not self.spider.check_robots(url):
                 log.info('%s - robots forbidden : %s' % (self.name, url))
                 continue
             page = WebPage(url)
-            print('%s prepare to fetch %s' % (self.name, url))
+            # print('%s prepare to fetch %s' % (self.name, url))
             if page.fetch():
                 self.spider.db.save_data(page.get_data())
                 for link in page.get_link():                        # retrive links from html

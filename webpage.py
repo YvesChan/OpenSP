@@ -55,12 +55,35 @@ class WebPage(object):
         '''get unique links from html and process unstandard url, return a set'''
         soup = BeautifulSoup(self.html)
         urlset = set()
+        print("extending links from %s" % self.url)
         for a in soup.find_all('a', href = True):
-            href = a.get('href').encode('utf8')         # Note: deal with Chinese link
-            if urlparse(href).scheme == '':             # lack of scheme (relative url)
-                href = urljoin(self.url, href)
-            urlset.add(href)
+            url = a.get('href').encode('utf8')         # Note: deal with Chinese link
+            standard_url = self.filter_url(url)
+            if standard_url is not None:
+                urlset.add(standard_url)
+            else:
+                log.info('get_link() : drop link %s' % url)
         return urlset
+
+    def filter_url(self, url, key = None):
+        '''check the url extended from webpage, transform it into standard format or drop it'''
+        res = urlparse(url)
+        accept_type = {'htm', 'html', 'shtml', 'xhtml', 'jsp', 'php', 'asp', 'aspx', ''}
+        # Check link's type. First get the url's filename(no slash), then judge it's type
+        # Since we can't predict whether this url is a webpage of directory path(e.g. www.foo.com/bar/abc or www.foo.com/bar/abc/), so '' is acceptable
+        if res.scheme not in {'http', 'https', ''}:     # other scheme(e.g. javascript, mailto...) is filtered
+            return None
+        if res.scheme == '':
+            url = urljoin(self.url, url) 
+        path = res.path.split('/')[-1]      # judge directory , accept '/abc/def' or '/abc/def/'
+        if '.' not in path:                 # may be dir
+            if len(path) > 10:
+                return None
+        if path.split('.')[-1] not in accept_type:        # get file type
+            return None 
+        if key is not None and key not in url:
+            return None
+        return url
 
 
 

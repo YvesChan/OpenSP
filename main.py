@@ -45,13 +45,15 @@ class printProgress(Thread):
         self.daemon = True              # exit with the main Thread
 
     def run(self):
-        while self.spider.status:
-            print '\n-------------------------------------------'
-            print 'CurrentDepth : %d' % self.spider.currentDepth
-            print 'Already visited %d Links' % len(self.spider.visited_list)
-            print '%d tasks remaining in task_list.' % len(self.spider.prefetch_list)
-            print '-------------------------------------------\n'   
-            time.sleep(self.interval)
+        while 1:
+            if self.spider.status:
+                print '\n-------------------------------------------'
+                print 'CurrentDepth : %d' % self.spider.curr_depth
+                print 'Already visited %d Links' % len(self.spider.visited_list)
+                print '%d tasks remaining in task_list.' % self.spider.task_list.qsize()
+                print '%d urls extended.' % len(self.spider.extend_list)
+                print '-------------------------------------------\n'   
+                time.sleep(self.interval)
 
     def print_total_time(self):
         self.end_time = datetime.now()
@@ -68,7 +70,7 @@ if __name__ == '__main__':
     else:
         spider = Spider(args)
         printpro = printProgress(spider, args.interval)
-        spider.start()
         printpro.start() 
+        spider.start()
         print("Misson complete")
         printpro.print_total_time()
